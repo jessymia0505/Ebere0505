@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+
+  --color-calm-dark: #020617;
+  --color-calm-deep: #0f172a;
+  --color-calm-soft-blue: #3b82f6;
+  --color-calm-purple: #8b5cf6;
+  --color-calm-accent: #a855f7;
+  --color-muted: #cbd5e1;
+}
+
+@layer base {
+  body {
+    @apply bg-calm-dark text-white font-sans antialiased selection:bg-calm-purple/50;
+  }
+}
+
+.glow {
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+}
+
+.glass {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  @apply transition-all duration-300 shadow-2xl;
+}
+
+.glass:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+}
+
+.btn-grad {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  @apply transition-all duration-200 shadow-lg font-bold;
+}
+
+.btn-grad:hover {
+  @apply opacity-100 scale-105 shadow-blue-500/40;
+}
+
+.orb {
+  @apply absolute rounded-full blur-[100px] -z-10 opacity-40;
+}
+
+.purple-glow {
+  box-shadow: 0 0 50px rgba(139, 92, 246, 0.3);
+}
