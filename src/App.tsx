@@ -177,58 +177,39 @@ export default function App() {
       <div className="orb w-[200px] h-[200px] bg-blue-400/5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 glass px-6 py-4 flex justify-between items-center h-20">
+      <header className="sticky top-0 z-50 glass px-6 py-4 grid grid-cols-3 items-center h-20 shadow-2xl">
+        {/* Left: Menu Button */}
+        <div className="flex justify-start">
+          <button 
+            className="text-white hover:text-blue-400 transition-colors p-2"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+
+        {/* Center: App Title/Logo */}
         <div 
-          className="flex items-center gap-4 cursor-pointer"
+          className="flex items-center justify-center gap-3 cursor-pointer group"
           onClick={() => setCurrentPage('home')}
         >
-          <div className="w-8 h-8 rounded-lg btn-grad shadow-lg shadow-blue-500/20 flex items-center justify-center">
-            <Menu className="text-white w-5 h-5" />
+          <div className="w-8 h-8 rounded-lg btn-grad shadow-lg shadow-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <Brain className="text-white w-5 h-5" />
           </div>
-          <span className="text-xl font-display font-semibold tracking-tight">MindEase</span>
+          <span className="text-xl font-display font-black tracking-tighter uppercase">MindEase</span>
         </div>
         
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <button 
-            onClick={() => setCurrentPage('home')} 
-            className={`${currentPage === 'home' ? 'text-blue-300' : 'text-white/60'} hover:text-white transition-colors cursor-pointer`}
+        {/* Right: Analytics Button */}
+        <div className="flex justify-end">
+          <a 
+            href="https://analytics.vgdh.io/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="btn-grad px-4 py-2 md:px-6 md:py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all flex items-center gap-2 glow"
           >
-            Home
-          </button>
-          <button 
-            onClick={() => {
-              setCurrentPage('home');
-              setTimeout(() => {
-                document.getElementById('problem-grid')?.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
-            }} 
-            className="text-white/60 hover:text-white transition-colors cursor-pointer"
-          >
-            Exercises
-          </button>
-          <button 
-            onClick={() => {
-              setCurrentPage('home');
-              setTimeout(() => {
-                document.getElementById('problem-grid')?.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
-            }} 
-            className="text-white/60 hover:text-white transition-colors cursor-pointer"
-          >
-            Resources
-          </button>
-          <div className="flex items-center gap-2 px-3 py-1 glass rounded-full">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-xs">Ready for today</span>
-          </div>
-        </nav>
-
-        <button 
-          className="md:hidden text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X /> : <Menu />}
-        </button>
+            Analytics <Zap size={14} className="hidden sm:inline" />
+          </a>
+        </div>
       </header>
 
       {/* Mobile Menu */}
