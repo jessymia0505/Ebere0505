@@ -149,6 +149,28 @@ const mentalResources: ProblemSolution[] = [
   }
 ];
 
+function AdUnit({ slot, className = "" }: { slot: string, className?: string }) {
+  useEffect(() => {
+    try {
+      // @ts-ignore
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      // Ads might be blocked or failing to load
+    }
+  }, []);
+
+  return (
+    <div className={`flex justify-center w-full overflow-hidden max-w-7xl mx-auto px-6 py-6 ${className}`}>
+      <ins className="adsbygoogle"
+           style={{ display: 'block' }}
+           data-ad-client="ca-pub-7508765483045871"
+           data-ad-slot={slot}
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+  );
+}
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'detail'>('home');
   const [selectedProblem, setSelectedProblem] = useState<ProblemSolution | null>(null);
@@ -288,6 +310,11 @@ export default function App() {
                   Start Now
                 </button>
               </motion.div>
+
+              {/* Sidebar Ad Unit */}
+              <div className="mt-12 hidden lg:block">
+                <AdUnit slot="7775553331" className="!px-0" />
+              </div>
             </section>
 
             {/* Right Section: Problem & Solution Grid */}
@@ -346,6 +373,8 @@ export default function App() {
                       {selectedProblem?.whyItHappens}
                     </p>
                   </section>
+
+                  <AdUnit slot="6664442220" className="!px-0" />
 
                   <section className="glass rounded-3xl p-8 border-l-4 border-l-calm-accent">
                     <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
