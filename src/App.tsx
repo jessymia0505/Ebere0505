@@ -176,17 +176,41 @@ export default function App() {
   const [selectedProblem, setSelectedProblem] = useState<ProblemSolution | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Analytics helper to reduce bounce rate
+  const trackEvent = (eventName: string, props: Record<string, any> = {}) => {
+    try {
+      // Ensure the global plausible function exists even if script hasn't loaded yet
+      // @ts-ignore
+      window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) };
+      
+      // @ts-ignore
+      window.plausible(eventName, { props });
+      
+      // Keep your custom fallback as well
+      // @ts-ignore
+      (window.analyticsEvents = window.analyticsEvents || []).push({ event: eventName, ...props, timestamp: new Date().toISOString() });
+      
+      console.log(`[Analytics] Tracked: ${eventName}`, props);
+    } catch (e) {
+      console.warn('Analytics event failed to track', e);
+    }
+  };
+
   // Scroll to top when page changes
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [currentPage]);
+    // Track manual page view when the internal state route changes
+    trackEvent('page_view', { page: currentPage, problemId: selectedProblem?.id });
+  }, [currentPage, selectedProblem]);
 
   const handleLearnMore = (problem: ProblemSolution) => {
+    trackEvent('click_learn_more', { problemId: problem.id });
     setSelectedProblem(problem);
     setCurrentPage('detail');
   };
 
   const handleBack = () => {
+    trackEvent('click_back_to_home');
     setCurrentPage('home');
     setSelectedProblem(null);
   };
@@ -204,7 +228,10 @@ export default function App() {
         <div className="flex justify-start">
           <button 
             className="text-white hover:text-blue-400 transition-colors p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => {
+              setIsMenuOpen(!isMenuOpen);
+              trackEvent('toggle_menu', { state: !isMenuOpen ? 'open' : 'closed' });
+            }}
           >
             {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -213,7 +240,10 @@ export default function App() {
         {/* Center: App Title/Logo */}
         <div 
           className="flex items-center justify-center gap-3 cursor-pointer group"
-          onClick={() => setCurrentPage('home')}
+          onClick={() => {
+            setCurrentPage('home');
+            trackEvent('click_logo_home');
+          }}
         >
           <div className="w-8 h-8 rounded-lg btn-grad shadow-lg shadow-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
             <Brain className="text-white w-5 h-5" />
@@ -227,6 +257,7 @@ export default function App() {
             href="https://analytics.vgdh.io/" 
             target="_blank" 
             rel="noopener noreferrer"
+            onClick={() => trackEvent('click_header_analytics')}
             className="btn-grad px-4 py-2 md:px-6 md:py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-all flex items-center gap-2 glow"
           >
             Analytics <Zap size={14} className="hidden sm:inline" />
@@ -247,6 +278,7 @@ export default function App() {
               onClick={() => {
                 setCurrentPage('home');
                 setIsMenuOpen(false);
+                trackEvent('mobile_click_home');
               }} 
               className="text-3xl font-black uppercase tracking-tighter hover:text-blue-400 transition-colors"
             >
@@ -256,6 +288,7 @@ export default function App() {
               onClick={() => {
                 setCurrentPage('home');
                 setIsMenuOpen(false);
+                trackEvent('mobile_click_exercises');
                 setTimeout(() => {
                   document.getElementById('problem-grid')?.scrollIntoView({ behavior: 'smooth' });
                 }, 300);
@@ -268,6 +301,7 @@ export default function App() {
               onClick={() => {
                 setCurrentPage('home');
                 setIsMenuOpen(false);
+                trackEvent('mobile_click_resources');
                 setTimeout(() => {
                   document.getElementById('problem-grid')?.scrollIntoView({ behavior: 'smooth' });
                 }, 300);
@@ -304,6 +338,7 @@ export default function App() {
                   onClick={() => {
                     const el = document.getElementById('problem-grid');
                     el?.scrollIntoView({ behavior: 'smooth' });
+                    trackEvent('click_hero_start_now');
                   }}
                   className="btn-grad px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 w-max"
                 >
@@ -331,6 +366,7 @@ export default function App() {
                     <ProblemCard 
                       resource={item} 
                       onLearnMore={() => handleLearnMore(item)} 
+                      trackEvent={trackEvent}
                     />
                   </motion.div>
                 ))}
@@ -403,6 +439,7 @@ export default function App() {
                       href={selectedProblem?.link} 
                       target="_blank" 
                       rel="noopener noreferrer"
+                      onClick={() => trackEvent('click_external_tool', { problemId: selectedProblem?.id, tool: selectedProblem?.link })}
                       className="w-full bg-white text-calm-dark hover:bg-white/90 px-6 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                     >
                       Try Now <ExternalLink size={18} />
@@ -425,14 +462,30 @@ export default function App() {
       <footer className="h-20 border-t border-white/10 mt-20 flex flex-col md:flex-row justify-between items-center px-8 text-[11px] text-muted bg-[#0f172a]/50">
         <div className="flex gap-6">
           <span>&copy; 2026 MindEase Wellness</span>
-          <span className="hover:text-blue-300 cursor-pointer">Privacy Policy</span>
-          <span className="hover:text-blue-300 cursor-pointer">Terms of Use</span>
+          <span 
+            className="hover:text-blue-300 cursor-pointer"
+            onClick={() => trackEvent('click_footer_privacy')}
+          >
+            Privacy Policy
+          </span>
+          <span 
+            className="hover:text-blue-300 cursor-pointer"
+            onClick={() => trackEvent('click_footer_terms')}
+          >
+            Terms of Use
+          </span>
         </div>
         <div className="flex flex-col md:flex-row gap-6 items-center mt-4 md:mt-0">
-          <span>Telegram: <span className="text-white">@Getverse</span></span>
-          <span>X: <span className="text-white">@VerseEcosystem</span></span>
+          <span className="cursor-default">Telegram: <span className="text-white hover:text-blue-300 cursor-pointer" onClick={() => trackEvent('click_footer_telegram')}>@Getverse</span></span>
+          <span className="cursor-default">X: <span className="text-white hover:text-blue-300 cursor-pointer" onClick={() => trackEvent('click_footer_x')}>@VerseEcosystem</span></span>
           <div className="flex gap-3 ml-0 md:ml-4">
-            <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-500/20 transition-colors">
+            <div 
+              className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-500/20 transition-colors cursor-pointer"
+              onClick={() => {
+                trackEvent('click_footer_twitter_icon');
+                window.open('https://twitter.com/VerseEcosystem', '_blank');
+              }}
+            >
               <Twitter className="w-3 h-3" />
             </div>
           </div>
@@ -442,7 +495,7 @@ export default function App() {
   );
 }
 
-function ProblemCard({ resource, onLearnMore }: { resource: ProblemSolution, onLearnMore: () => void }) {
+function ProblemCard({ resource, onLearnMore, trackEvent }: { resource: ProblemSolution, onLearnMore: () => void, trackEvent: any }) {
   return (
     <div className="glass p-8 rounded-[2.5rem] flex flex-col justify-between h-full group border-2">
       <div className="space-y-5">
@@ -463,6 +516,7 @@ function ProblemCard({ resource, onLearnMore }: { resource: ProblemSolution, onL
           href={resource.link} 
           target="_blank" 
           rel="noopener noreferrer"
+          onClick={() => trackEvent('click_grid_try_now', { problemId: resource.id, link: resource.link })}
           className="flex-1 text-center py-3.5 btn-grad rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-1 shadow-xl"
         >
           Try Now
